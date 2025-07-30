@@ -1,261 +1,397 @@
 'use client';
-import React, {JSX} from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, JSX } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
-  Activity, 
-  BarChart3, 
-  Settings, 
-  Users, 
-  ChevronLeft,
-  ChevronRight,
+  User,
+  Settings,
+  LogOut,
+  Activity,
   Zap,
-  GitBranch,
+  BarChart3,
   Clock,
   CheckCircle,
   XCircle,
-  TrendingUp
+  Play,
+  Users,
+  Key,
+  Bell,
+  ChevronRight,
+  ChevronDown,
+  Rocket,
+  Globe,
+  Shield,
+  HelpCircle
 } from 'lucide-react';
+import { useWebSocket } from '@/hooks/useWebSocket';
 import { Logo } from './ui/Logo';
 
 interface SidebarProps {
-  collapsed: boolean;
+  isCollapsed: boolean;
   onToggle: () => void;
-  currentView: string;
-  onViewChange: (view: 'deployments' | 'analytics' | 'settings' | 'team') => void;
-  stats: {
-    running: number;
-    successful: number;
-    failed: number;
-    total: number;
-  };
 }
 
-export function Sidebar({ collapsed, onToggle, currentView, onViewChange, stats }: SidebarProps): JSX.Element {
-  const menuItems = [
+export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
+  const pathname = usePathname();
+  const { connected, deployments } = useWebSocket();
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['overview']));
+
+  // Calculate stats
+  const runningDeployments = deployments.filter(d => d.status === 'running');
+  const todayDeployments = deployments.filter(d => {
+    const today = new Date();
+    const deployDate = new Date(d.startTime);
+    return deployDate.toDateString() === today.toDateString();
+  });
+  const successRate = deployments.length > 0 ? 
+    Math.round((deployments.filter(d => d.status === 'success').length / deployments.length) * 100) : 100;
+
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const menuSections = [
     {
-      id: 'deployments',
-      label: 'Deployments',
-      icon: Activity,
-      badge: stats.running > 0 ? stats.running : undefined,
-      badgeColor: 'bg-orange-500'
+      id: 'overview',
+      title: 'Overview',
+      items: [
+        { icon: Activity, label: 'Projects', href: '/projects', badge: null },
+        { icon: BarChart3, label: 'Analytics', href: '/analytics', badge: 'Soon' },
+        { icon: Clock, label: 'Activity', href: '/activity', badge: todayDeployments.length }
+      ]
     },
     {
-      id: 'analytics',
-      label: 'Analytics',
-      icon: BarChart3,
-      badge: undefined
+      id: 'deployment',
+      title: 'Deployment',
+      items: [
+        { icon: Rocket, label: 'Deploy All Staging', href: '#', action: 'deployAllStaging' },
+        { icon: Globe, label: 'System Status', href: '/status', badge: connected ? 'Online' : 'Offline' },
+        { icon: Bell, label: 'Notifications', href: '/notifications', badge: runningDeployments.length || null }
+      ]
     },
     {
-      id: 'team',
-      label: 'Team',
-      icon: Users,
-      badge: undefined
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      badge: undefined
+      id: 'management',
+      title: 'Management',
+      items: [
+        { icon: Users, label: 'Teams', href: '/teams', badge: 'Soon' },
+        { icon: Key, label: 'API Keys', href: '/api-keys', badge: null },
+        { icon: Shield, label: 'Security', href: '/security', badge: 'Soon' }
+      ]
     }
   ];
 
+  const isActive = (href: string): boolean => {
+    if (href === '/projects') return pathname.startsWith('/projects');
+    return pathname === href;
+  };
+
+  // Mock user data - replace with real auth later
+  const user = {
+    name: 'John Doe',
+    email: 'john@ossix.com',
+    avatar: null,
+    role: 'Admin'
+  };
+
   return (
-    <motion.div
-      animate={{ width: collapsed ? 80 : 280 }}
+    <motion.aside
+      initial={false}
+      animate={{ width: isCollapsed ? 80 : 320 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col"
+      className="bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col h-screen relative z-10"
     >
       {/* Header */}
       <div className="p-4 border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
-          <Logo size="md" showText={!collapsed} />
+          <AnimatePresence mode="wait">
+            {!isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Logo size="md" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
           <button
             onClick={onToggle}
-            className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="p-2 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4 text-slate-400" />
-            ) : (
-              <ChevronLeft className="h-4 w-4 text-slate-400" />
-            )}
+            <ChevronRight className={`h-4 w-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />
           </button>
         </div>
       </div>
 
-      {/* Enhanced Stats Overview */}
-      {!collapsed && (
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-          <div className="space-y-4">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Pipeline Status</span>
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs text-green-600 dark:text-green-400 font-medium">Live</span>
-              </div>
-            </div>
-            
-            {/* Main Stats Grid */}
-            <div className="space-y-3">
-              {/* Running Deployments */}
-              <motion.div 
-                className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-3 text-white shadow-lg"
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+      {/* User Profile */}
+      <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-ossix-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <User className="h-5 w-5 text-white" />
+          </div>
+          
+          <AnimatePresence mode="wait">
+            {!isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 min-w-0"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm font-medium">Running</span>
-                  </div>
-                  {stats.running > 0 && (
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  )}
+                <div className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                  {user.name}
                 </div>
-                <div className="text-2xl font-bold mt-1">
-                  {stats.running}
+                <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {user.email}
                 </div>
-                <div className="text-xs opacity-90">
-                  Active deployments
+                <div className="text-xs text-ossix-600 dark:text-ossix-400 font-medium">
+                  {user.role}
                 </div>
               </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
-              {/* Success/Failed Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <motion.div 
-                  className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-3 text-white shadow-md"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <div className="flex items-center space-x-2 mb-1">
-                    <CheckCircle className="h-3 w-3" />
-                    <span className="text-xs font-medium">Success</span>
-                  </div>
-                  <div className="text-lg font-bold">
-                    {stats.successful}
-                  </div>
-                </motion.div>
-                
-                <motion.div 
-                  className="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-3 text-white shadow-md"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <div className="flex items-center space-x-2 mb-1">
-                    <XCircle className="h-3 w-3" />
-                    <span className="text-xs font-medium">Failed</span>
-                  </div>
-                  <div className="text-lg font-bold">
-                    {stats.failed}
-                  </div>
-                </motion.div>
+      {/* Stats Dashboard */}
+      <AnimatePresence mode="wait">
+        {!isCollapsed && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="p-4 border-b border-slate-200 dark:border-slate-700"
+          >
+            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+              Quick Stats
+            </h3>
+            
+            <div className="space-y-3">
+              {/* Running Deployments */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                  <span className="text-sm text-slate-600 dark:text-slate-300">Running</span>
+                </div>
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  {runningDeployments.length}
+                </span>
               </div>
-              
-              {/* Total Summary */}
-              <div className="bg-gradient-to-r from-slate-700 to-slate-800 dark:from-slate-600 dark:to-slate-700 rounded-lg p-3 text-white shadow-md">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="text-sm font-medium">Total Deployments</span>
-                  </div>
-                  <GitBranch className="h-4 w-4 opacity-70" />
+
+              {/* Today's Deployments */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  <span className="text-sm text-slate-600 dark:text-slate-300">Today</span>
                 </div>
-                <div className="flex items-baseline justify-between mt-2">
-                  <span className="text-2xl font-bold">
-                    {stats.total}
-                  </span>
-                  <span className="text-xs opacity-80">
-                    All time
-                  </span>
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  {todayDeployments.length}
+                </span>
+              </div>
+
+              {/* Success Rate */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  <span className="text-sm text-slate-600 dark:text-slate-300">Success</span>
                 </div>
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  {successRate}%
+                </span>
+              </div>
+
+              {/* Connection Status */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className="text-sm text-slate-600 dark:text-slate-300">Status</span>
+                </div>
+                <span className={`text-sm font-medium ${connected ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {connected ? 'Online' : 'Offline'}
+                </span>
               </div>
             </div>
-
-            {/* Success Rate */}
-            {stats.total > 0 && (
-              <div className="bg-slate-50 dark:bg-slate-750 rounded-lg p-3 border border-slate-200 dark:border-slate-600">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Success Rate</span>
-                  <span className="text-xs font-bold text-green-600 dark:text-green-400">
-                    {Math.round((stats.successful / stats.total) * 100)}%
-                  </span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-600 rounded-full h-2">
-                  <motion.div
-                    className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(stats.successful / stats.total) * 100}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
-        <div className="space-y-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            
-            return (
-              <motion.button
-                key={item.id}
-                onClick={() => onViewChange(item.id as any)}
-                whileHover={{ x: 2 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-gradient-to-r from-ossix-100 to-ossix-50 text-ossix-700 dark:from-ossix-900/30 dark:to-ossix-800/20 dark:text-ossix-400 shadow-sm border border-ossix-200 dark:border-ossix-800'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-700'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {!collapsed && (
-                  <>
-                    <span className="ml-3 flex-1 text-left">{item.label}</span>
-                    {item.badge && (
-                      <motion.span 
-                        className={`ml-2 px-2 py-0.5 text-xs font-medium text-white rounded-full ${item.badgeColor}`}
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        {item.badge}
-                      </motion.span>
-                    )}
-                  </>
+      <nav className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-4">
+          {menuSections.map((section) => (
+            <div key={section.id}>
+              {/* Section Header */}
+              <AnimatePresence mode="wait">
+                {!isCollapsed && (
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => toggleSection(section.id)}
+                    className="flex items-center justify-between w-full text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                  >
+                    <span>{section.title}</span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${expandedSections.has(section.id) ? '' : '-rotate-90'}`} />
+                  </motion.button>
                 )}
-              </motion.button>
-            );
-          })}
+              </AnimatePresence>
+
+              {/* Section Items */}
+              <AnimatePresence>
+                {(isCollapsed || expandedSections.has(section.id)) && (
+                  <motion.div
+                    initial={!isCollapsed ? { opacity: 0, height: 0 } : false}
+                    animate={!isCollapsed ? { opacity: 1, height: 'auto' } : false}
+                    exit={!isCollapsed ? { opacity: 0, height: 0 } : false}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-1"
+                  >
+                    {section.items.map((item) => {
+                      const isItemActive = isActive(item.href);
+                      
+                      return (
+                        <Link
+                          key={item.label}
+                          href={item.href === '#' ? '#' : item.href}
+                          onClick={(e) => {
+                            if (item.action === 'deployAllStaging') {
+                              e.preventDefault();
+                              // Implement deploy all staging logic here
+                              console.log('Deploy all staging');
+                            }
+                          }}
+                          className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors group ${
+                            isItemActive
+                              ? 'bg-ossix-100 dark:bg-ossix-900/50 text-ossix-700 dark:text-ossix-300'
+                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <item.icon className={`h-4 w-4 flex-shrink-0 ${
+                              isItemActive ? 'text-ossix-600 dark:text-ossix-400' : ''
+                            }`} />
+                            
+                            <AnimatePresence mode="wait">
+                              {!isCollapsed && (
+                                <motion.span
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: -10 }}
+                                  transition={{ duration: 0.15 }}
+                                >
+                                  {item.label}
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
+                          </div>
+
+                          {/* Badges */}
+                          <AnimatePresence mode="wait">
+                            {!isCollapsed && item.badge && (
+                              <motion.span
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  item.badge === 'Soon'
+                                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                                    : item.badge === 'Online'
+                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                    : item.badge === 'Offline'
+                                    ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                }`}
+                              >
+                                {item.badge}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </Link>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
         </div>
       </nav>
 
-      {/* Enhanced User Profile */}
+      {/* Bottom Actions */}
       <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-        <motion.div 
-          className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-750 dark:to-slate-700 border border-slate-200 dark:border-slate-600 hover:shadow-md transition-all cursor-pointer"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="w-8 h-8 bg-gradient-to-br from-ossix-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
-            <span className="text-white text-sm font-bold">JD</span>
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                John Doe
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                DevOps Engineer
-              </p>
-            </div>
-          )}
-        </motion.div>
+        <div className="space-y-1">
+          <Link
+            href="/settings"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <Settings className="h-4 w-4" />
+            <AnimatePresence mode="wait">
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  Settings
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+
+          <Link
+            href="/help"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <HelpCircle className="h-4 w-4" />
+            <AnimatePresence mode="wait">
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  Help & Support
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+
+          <button
+            onClick={() => {
+              // Implement logout logic here
+              console.log('Logout');
+            }}
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full"
+          >
+            <LogOut className="h-4 w-4" />
+            <AnimatePresence mode="wait">
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  Logout
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        </div>
       </div>
-    </motion.div>
+    </motion.aside>
   );
 }

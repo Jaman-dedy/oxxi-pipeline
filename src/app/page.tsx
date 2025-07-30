@@ -1,6 +1,5 @@
-import { Dashboard } from '@/components/Dashboard';
-import React, {JSX} from 'react';
+import { redirect } from 'next/navigation';
 
-export default function Home(): JSX.Element {
-  return <Dashboard />;
+export default function HomePage(): never {
+  redirect('/projects');
 }
