@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, JSX } from 'react';
+import React, { useState, useEffect, JSX } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -22,7 +22,10 @@ import {
   Rocket,
   Globe,
   Shield,
-  HelpCircle
+  HelpCircle,
+  Terminal,
+  History,
+  Archive
 } from 'lucide-react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Logo } from './ui/Logo';
@@ -44,8 +47,37 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
     const deployDate = new Date(d.startTime);
     return deployDate.toDateString() === today.toDateString();
   });
+  
+  // ✅ FIXED: Better command filtering
+  const runningCommands = deployments.filter(d => {
+    const isCommand = d.environment === 'command' || 
+                     d.environment === 'manual' || 
+                     d.project === 'global' ||
+                     d.project === 'manual-command';
+    return isCommand && d.status === 'running';
+  });
+
+  const allCommands = deployments.filter(d => 
+    d.environment === 'command' || 
+    d.environment === 'manual' || 
+    d.project === 'global' ||
+    d.project === 'manual-command'
+  );
+
+  // ✅ NEW: Recent commands (last 5 minutes) for better visibility
+  const recentCommands = deployments.filter(d => {
+    const isCommand = d.environment === 'command' || 
+                     d.environment === 'manual' || 
+                     d.project === 'global' ||
+                     d.project === 'manual-command';
+    
+    const isRecent = new Date().getTime() - new Date(d.startTime).getTime() < 300000; // 5 minutes
+    return isCommand && isRecent;
+  });
+  
   const successRate = deployments.length > 0 ? 
     Math.round((deployments.filter(d => d.status === 'success').length / deployments.length) * 100) : 100;
+
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
@@ -64,7 +96,8 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
       items: [
         { icon: Activity, label: 'Projects', href: '/projects', badge: null },
         { icon: BarChart3, label: 'Analytics', href: '/analytics', badge: 'Soon' },
-        { icon: Clock, label: 'Activity', href: '/activity', badge: todayDeployments.length }
+        { icon: Clock, label: 'Activity', href: '/activity', badge: todayDeployments.length },
+        { icon: History, label: 'Deployment History', href: '/historical-logs', badge: null },
       ]
     },
     {
@@ -74,6 +107,31 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
         { icon: Rocket, label: 'Deploy All Staging', href: '#', action: 'deployAllStaging' },
         { icon: Globe, label: 'System Status', href: '/status', badge: connected ? 'Online' : 'Offline' },
         { icon: Bell, label: 'Notifications', href: '/notifications', badge: runningDeployments.length || null }
+      ]
+    },
+    // ✅ NEW: Global Commands Section
+    {
+      id: 'commands',
+      title: 'Global Commands',
+      items: [
+        { 
+          icon: Terminal, 
+          label: 'Active Commands', 
+          href: '/commands', 
+          badge: runningCommands.length > 0 ? runningCommands.length : (recentCommands.length > 0 ? recentCommands.length : null)
+        },
+        { 
+          icon: History, 
+          label: 'Command History', 
+          href: '/commands/history', 
+          badge: allCommands.length || null 
+        },
+        { 
+          icon: Archive, // You'll need to import this from lucide-react
+          label: 'Deployment History', 
+          href: '/deployments/history', 
+          badge: null 
+        }
       ]
     },
     {
@@ -89,6 +147,8 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
 
   const isActive = (href: string): boolean => {
     if (href === '/projects') return pathname.startsWith('/projects');
+    if (href === '/commands') return pathname.startsWith('/commands');
+    if (href === '/historical-logs') return pathname.startsWith('/historical-logs');
     return pathname === href;
   };
 
@@ -189,6 +249,17 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
                 </span>
               </div>
 
+              {/* ✅ UPDATED: Commands stat with better counting */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${runningCommands.length > 0 ? 'bg-purple-500 animate-pulse' : 'bg-purple-400'}`} />
+                  <span className="text-sm text-slate-600 dark:text-slate-300">Commands</span>
+                </div>
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  {runningCommands.length > 0 ? runningCommands.length : recentCommands.length}
+                </span>
+              </div>
+
               {/* Today's Deployments */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -222,6 +293,48 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
                 </span>
               </div>
             </div>
+
+            {/* ✅ UPDATED: Active Commands Quick Panel */}
+            {(runningCommands.length > 0 || recentCommands.length > 0) && (
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+                <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                  {runningCommands.length > 0 ? 'Active Commands' : 'Recent Commands'}
+                </h4>
+                <div className="space-y-2">
+                  {(runningCommands.length > 0 ? runningCommands : recentCommands).slice(0, 3).map((command) => (
+                    <Link
+                      key={command.id}
+                      href={`/commands/${command.id}`}
+                      className="flex items-center space-x-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-750 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      <div className={`w-2 h-2 rounded-full ${
+                        command.status === 'running' ? 'bg-purple-500 animate-pulse' :
+                        command.status === 'success' ? 'bg-green-500' :
+                        command.status === 'failed' ? 'bg-red-500' : 'bg-slate-400'
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
+                          {command.project === 'global' ? 'Global Command' : command.project || 'Command'}
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                          {command.status === 'running' ? 'Running...' : 
+                           command.status === 'success' ? 'Completed' : 
+                           command.status === 'failed' ? 'Failed' : 'Finished'}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                  {(runningCommands.length > 3 || recentCommands.length > 3) && (
+                    <Link
+                      href="/commands"
+                      className="text-xs text-ossix-600 dark:text-ossix-400 hover:text-ossix-700 dark:hover:text-ossix-300 font-medium"
+                    >
+                      +{Math.max(runningCommands.length, recentCommands.length) - 3} more
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -251,9 +364,9 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
               <AnimatePresence>
                 {(isCollapsed || expandedSections.has(section.id)) && (
                   <motion.div
-                    initial={!isCollapsed ? { opacity: 0, height: 0 } : false}
-                    animate={!isCollapsed ? { opacity: 1, height: 'auto' } : false}
-                    exit={!isCollapsed ? { opacity: 0, height: 0 } : false}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
                     className="space-y-1"
                   >
@@ -267,8 +380,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
                           onClick={(e) => {
                             if (item.action === 'deployAllStaging') {
                               e.preventDefault();
-                              // Implement deploy all staging logic here
-                              console.log('Deploy all staging');
+                              // TODO: Implement deploy all staging logic here
                             }
                           }}
                           className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors group ${
@@ -310,6 +422,8 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
                                     ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                                     : item.badge === 'Offline'
                                     ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                                    : typeof item.badge === 'number' && item.badge > 0
+                                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                                     : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                                 }`}
                               >
@@ -371,8 +485,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps): JSX.Element {
 
           <button
             onClick={() => {
-              // Implement logout logic here
-              console.log('Logout');
+              // TODO Implement logout logic here
             }}
             className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full"
           >

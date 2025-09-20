@@ -2,11 +2,12 @@ import { ServiceDetail } from '@/components/ServiceDetail';
 import React, { JSX } from 'react';
 
 interface ServicePageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-export default function ServicePage({ params }: ServicePageProps): JSX.Element {
-  return <ServiceDetail projectSlug={params.slug} />;
+export default async function ServicePage({ params }: ServicePageProps): Promise<JSX.Element> {
+  const { slug } = await params;
+  return <ServiceDetail projectSlug={slug} />;
 }

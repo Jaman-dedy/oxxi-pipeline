@@ -1,5 +1,5 @@
 'use client';
-import React, {JSX} from 'react';
+import React, { JSX } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Square, 
@@ -20,12 +20,16 @@ interface DeploymentCardProps {
 }
 
 export function DeploymentCard({ deployment, onStop, onViewLogs }: DeploymentCardProps): JSX.Element {
+  
+
   const getStatusIcon = (): JSX.Element => {
     switch (deployment.status) {
       case 'running':
         return <Clock className="h-4 w-4 text-orange-500 animate-pulse" />;
       case 'success':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'interrupted':
+        return <Clock className="h-4 w-4 text-yellow-500" />;
       case 'failed':
         return <XCircle className="h-4 w-4 text-red-500" />;
       case 'stopped':
@@ -39,6 +43,8 @@ export function DeploymentCard({ deployment, onStop, onViewLogs }: DeploymentCar
         return 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20';
       case 'success':
         return 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20';
+      case 'interrupted':
+        return 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20';
       case 'failed':
         return 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20';
       case 'stopped':
@@ -52,6 +58,8 @@ export function DeploymentCard({ deployment, onStop, onViewLogs }: DeploymentCar
         return 'bg-orange-500';
       case 'success':
         return 'bg-green-500';
+      case 'interrupted':
+        return 'bg-yellow-500';
       case 'failed':
         return 'bg-red-500';
       case 'stopped':

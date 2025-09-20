@@ -1,0 +1,21 @@
+{
+    "name": "yeszm-backoffice",
+    "displayName": "YES Zambia Back Office",
+    "description": "Back office application for YES Bank Zambia",
+    "organization": "yeszm",
+    "host": "51.144.160.47",
+    "app_name": "backoffice",
+    "repo_name": "backoffice-web",
+    "ssh": false,
+    "production_url": "http://backoffice.yeszm.com",
+    "staging_url": "http://backoffice.yeszm.com:9090",
+    "workingDirectory": "../ossix-devops",
+    "deploy_production": "./scripts/back-office/deploy.sh --env=production --app_name=backoffice --repo_name=backoffice-web --org=yeszm --host=51.144.160.47",
+    "deploy_staging": "./scripts/back-office/deploy.sh --env=staging --app_name=backoffice --repo_name=backoffice-web --org=yeszm --host=51.144.160.47",
+    "deploy_all": "./scripts/back-office/deploy_all.sh",
+    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 restart backoffice-yeszm-production\"",
+    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 restart backoffice-yeszm-staging\"",
+    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 stop backoffice-yeszm-production\"",
+    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 stop backoffice-yeszm-staging\"",
+    "repository": "https://github.com/Ossix-Technologies/backoffice-web"
+  }

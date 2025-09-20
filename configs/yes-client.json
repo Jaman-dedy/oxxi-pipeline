@@ -1,0 +1,20 @@
+{
+    "name": "yesng-webapp",
+    "displayName": "YES Nigeria Web Application", 
+    "description": "Web application for YES Bank Nigeria",
+    "organization": "yesng",
+    "host": "172.201.30.223",
+    "app_name": "web-app",
+    "repo_name": "web-app-v2",
+    "ssh": false,
+    "production_url": "http://web-app.yesng.com",
+    "staging_url": "http://web-app.yesng.com:9090",
+    "deploy_production": "./ossix-devops/scripts/web-app/deploy.sh --env=production --app_name=web-app --repo_name=web-app-v2 --org=yesng --host=172.201.30.223",
+    "deploy_staging": "./ossix-devops/scripts/web-app/deploy.sh --env=staging --app_name=web-app --repo_name=web-app-v2 --org=yesng --host=172.201.30.223",
+    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 restart web-app-yesng-production\"",
+    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 restart web-app-yesng-staging\"",
+    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 stop web-app-yesng-production\"",
+    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 stop web-app-yesng-staging\"",
+    "repository": "https://github.com/Ossix-Technologies/web-app-v2",
+    "workingDirectory": "./ossix-devops"
+  }

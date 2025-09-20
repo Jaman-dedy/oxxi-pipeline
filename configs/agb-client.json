@@ -1,0 +1,20 @@
+{
+    "name": "agb-web",
+    "displayName": "AGB Web Banking",
+    "description": "Web banking application for Africa Golden Bank",
+    "organization": "agb",
+    "host": "4.180.244.99",
+    "app_name": "g-banking",
+    "repo_name": "agb-web",
+    "ssh": false,
+    "production_url": "http://g-banking.africagoldenbank.com",
+    "staging_url": "http://g-banking.africagoldenbank.com:9090",
+    "workingDirectory": "../ossix-devops",
+    "deploy_production": "./scripts/web-app/deploy.sh --env=production --app_name=g-banking --repo_name=agb-web --org=agb --host=4.180.244.99",
+    "deploy_staging": "./scripts/web-app/deploy.sh --env=staging --app_name=g-banking --repo_name=agb-web --org=agb --host=4.180.244.99",
+    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 restart g-banking-agb-production\"",
+    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 restart g-banking-agb-staging\"",
+    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 stop g-banking-agb-production\"",
+    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 stop g-banking-agb-staging\"",
+    "repository": "https://github.com/Ossix-Technologies/agb-web"
+}

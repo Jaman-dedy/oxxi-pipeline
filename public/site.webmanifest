@@ -1,0 +1,41 @@
+{
+    "name": "Ossix Pipeline",
+    "short_name": "Pipeline",
+    "description": "Modern deployment management dashboard with real-time monitoring",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#6366f1",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "categories": ["productivity", "developer", "utilities"],
+    "icons": [
+      {
+        "src": "/android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/android-chrome-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "Projects",
+        "short_name": "Projects",
+        "description": "View all projects",
+        "url": "/projects",
+        "icons": [
+          {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192"
+          }
+        ]
+      }
+    ]
+  }

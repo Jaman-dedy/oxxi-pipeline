@@ -1,0 +1,20 @@
+{
+    "name": "m2u-webapp",
+    "displayName": "M2U Web Application",
+    "description": "Web application for M2U financial services",
+    "organization": "m2u",
+    "host": "51.144.160.47",
+    "app_name": "web-app",
+    "repo_name": "m2u-webapp",
+    "ssh": false,
+    "production_url": "https://app.m2u.money",
+    "staging_url": "https://app.m2u.money:9090/",
+    "deploy_production": "./scripts/web-app/deploy.sh --env=production --app_name=web-app --repo_name=m2u-webapp --org=m2u --host=51.144.160.47",
+    "deploy_staging": "./scripts/web-app/deploy.sh --env=staging --app_name=web-app --repo_name=web-app-v2 --org=m2u --host=51.144.160.47",
+    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 restart web-app-m2u-production\"",
+    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 restart web-app-m2u-staging\"",
+    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 stop web-app-m2u-production\"",
+    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@51.144.160.47 \"pm2 stop web-app-m2u-staging\"",
+    "repository": "https://github.com/Ossix-Technologies/m2u-webapp",
+    "workingDirectory": "../ossix-devops"
+  }

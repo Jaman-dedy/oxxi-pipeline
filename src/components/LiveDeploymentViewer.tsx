@@ -22,7 +22,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { PROJECTS, LogEntry } from '@/lib/types';
+import { LogEntry } from '@/lib/types';
 
 interface LiveDeploymentViewerProps {
   projectSlug: string;
@@ -39,7 +39,6 @@ export function LiveDeploymentViewer({ projectSlug, deploymentId }: LiveDeployme
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const deployment = deployments.find(d => d.id === deploymentId);
-  const project = PROJECTS.find(p => p.name === projectSlug);
 
   useEffect(() => {
     if (autoScroll && !isPaused && logContainerRef.current) {
@@ -47,26 +46,9 @@ export function LiveDeploymentViewer({ projectSlug, deploymentId }: LiveDeployme
     }
   }, [deployment?.logs, autoScroll, isPaused]);
 
-  if (!deployment || !project) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <Terminal className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-          <h1 className="text-xl font-semibold text-white mb-2">Deployment Not Found</h1>
-          <p className="text-slate-400 mb-6">The deployment you're looking for doesn't exist or has been removed.</p>
-          <Link 
-            href={`/projects/${projectSlug}`}
-            className="inline-flex items-center px-4 py-2 rounded-lg bg-ossix-600 text-white hover:bg-ossix-700 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to {project?.displayName || 'Project'}
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   const filteredLogs = React.useMemo(() => {
+    if (!deployment) return [];
+    
     let logs = deployment.logs;
     
     if (logFilter !== 'all') {
@@ -80,7 +62,27 @@ export function LiveDeploymentViewer({ projectSlug, deploymentId }: LiveDeployme
     }
     
     return logs;
-  }, [deployment.logs, logFilter, searchTerm]);
+  }, [deployment?.logs, logFilter, searchTerm]);
+
+  if (!deployment) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Terminal className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <h1 className="text-xl font-semibold text-white mb-2">Deployment Not Found</h1>
+          <p className="text-slate-400 mb-6">The deployment you're looking for doesn't exist or has been removed.</p>
+          <Link 
+            href={`/projects/${projectSlug}`}
+            className="inline-flex items-center px-4 py-2 rounded-lg bg-ossix-600 text-white hover:bg-ossix-700 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to {projectSlug}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
 
   const getLogIcon = (type: LogEntry['type']): JSX.Element => {
     switch (type) {

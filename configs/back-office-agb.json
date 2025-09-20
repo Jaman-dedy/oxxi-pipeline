@@ -1,0 +1,20 @@
+{
+    "name": "back-office-agb",
+    "displayName": "Back Office - AGB",
+    "description": "Administrative dashboard and management tools for AGB",
+    "organization": "agb",
+    "host": "4.180.244.99",
+    "app_name": "back-office-app",
+    "repo_name": "back-office",
+    "production_url": "http://admin.africagoldenbank.com",
+    "staging_url": "http://admin.africagoldenbank.com:9091",
+    "deploy_production": "./ossix-devops/scripts/back-office/deploy.sh --env=production --app_name=back-office-app --repo_name=back-office --org=agb --host=4.180.244.99",
+    "deploy_staging": "./ossix-devops/scripts/back-office/deploy.sh --env=staging --app_name=back-office-app --repo_name=back-office --org=agb --host=4.180.244.99",
+    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 restart back-office-app-agb-production\"",
+    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 restart back-office-app-agb-staging\"",
+    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 stop back-office-app-agb-production\"",
+    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 stop back-office-app-agb-staging\"",
+    "repository": "https://github.com/Ossix-Technologies/back-office",
+    "workingDirectory": "./ossix-devops",
+    "ssh": false
+}

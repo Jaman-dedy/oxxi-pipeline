@@ -1,0 +1,20 @@
+{
+  "name": "cashpoint-v2",
+  "displayName": "Cashpoint V2 - AGB",
+  "description": "Next generation cashpoint system for AGB",
+  "organization": "agb",
+  "host": "4.180.244.99",
+  "app_name": "g-agency",
+  "repo_name": "cashpoint-v2",
+  "ssh": false,
+  "production_url": "http://g-agency.africagoldenbank.com",
+  "staging_url": "http://g-agency.africagoldenbank.com:9090",
+  "workingDirectory": "../ossix-devops",
+  "deploy_production": "./scripts/cashpoint-v2/deploy.sh --env=production --app_name=g-agency --repo_name=cashpoint-v2 --org=agb --host=4.180.244.99",
+  "deploy_staging": "./scripts/cashpoint-v2/deploy.sh --env=staging --app_name=g-agency --repo_name=cashpoint-v2 --org=agb --host=4.180.244.99",
+  "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 restart g-agency-agb-production\"",
+  "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 restart g-agency-agb-staging\"",
+  "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 stop g-agency-agb-production\"",
+  "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@4.180.244.99 \"pm2 stop g-agency-agb-staging\"",
+  "repository": "https://github.com/Ossix-Technologies/cashpoint-v2"
+}
