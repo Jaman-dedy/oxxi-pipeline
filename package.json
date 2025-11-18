@@ -5,11 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start -p ${PORT:-3000}",
+    "start": "next start",
     "dev:next": "next dev",
     "dev:server": "tsx watch src/server/index.ts",
     "start:server": "tsx src/server/index.ts",
-    "start:prod": "concurrently \"npm run start:server\" \"npm start\"",
+    "start:prod": "concurrently \"npm run start:server\" \"next start -p $PORT\"",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "prepare": "husky"
