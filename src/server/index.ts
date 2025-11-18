@@ -12,15 +12,22 @@ import cors from 'cors';
 
 const app = express();
 const httpServer = createServer(app);
+
+// Allow CORS for production
+const corsOrigin = process.env.NODE_ENV === 'production' 
+  ? 'https://oxxi-pipeline-production.up.railway.app'
+  : "*";
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : "*",
-    credentials: true
+    origin: corsOrigin,
+    credentials: true,
+    methods: ['GET', 'POST']
   }
 });
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? false : "*",
+  origin: corsOrigin,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
