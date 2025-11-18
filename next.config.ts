@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Rewrite API requests to backend server
+  // Rewrite API and Socket.IO requests to backend server
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     
@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       {
         source: '/api/:path*',
         destination: `${apiUrl}/api/:path*`,
+      },
+      {
+        source: '/socket.io/:path*',
+        destination: `${apiUrl}/socket.io/:path*`,
       },
     ];
   },
