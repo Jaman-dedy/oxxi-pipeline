@@ -140,7 +140,7 @@ export function useHistoricalLogs(): UseHistoricalLogsReturn {
   // Retry state
   const [lastFailedRequest, setLastFailedRequest] = useState<() => Promise<void> | null>();
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin : '');
   const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   const clearError = useCallback(() => {

@@ -1,26 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Rewrite API and Socket.IO requests to backend server
-  async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${apiUrl}/api/:path*`,
-      },
-      {
-        source: '/socket.io',
-        destination: `${apiUrl}/socket.io/`,
-      },
-      {
-        source: '/socket.io/:path*',
-        destination: `${apiUrl}/socket.io/:path*`,
-      },
-    ];
-  },
-
   // Configure headers for WebSocket support
   async headers() {
     return [

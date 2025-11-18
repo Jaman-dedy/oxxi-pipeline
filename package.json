@@ -9,7 +9,7 @@
     "dev:next": "next dev",
     "dev:server": "tsx watch src/server/index.ts",
     "start:server": "tsx src/server/index.ts",
-    "start:prod": "concurrently \"npm run start:server\" \"next start -p $PORT\"",
+    "start:prod": "tsx src/server/index.ts",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "prepare": "husky"
