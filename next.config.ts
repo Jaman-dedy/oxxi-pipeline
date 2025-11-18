@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configure headers for WebSocket support
+  // Proxy API and Socket.IO to backend
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:3001/api/:path*',
+      },
+      {
+        source: '/socket.io/:path*',
+        destination: 'http://localhost:3001/socket.io/:path*',
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
@@ -20,7 +33,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Transpile dependencies if needed
   transpilePackages: ['socket.io-client'],
 };
 
