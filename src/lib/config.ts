@@ -1,7 +1,7 @@
 // lib/config.ts - Only truly global server settings
 export const SERVER_CONFIG = {
-  // WebSocket / HTTP server settings
-  websocketPort: process.env.PORT || process.env.WEBSOCKET_PORT || 3001,
+  // WebSocket / HTTP server settings - always use 3001 for backend
+  websocketPort: process.env.WEBSOCKET_PORT || 3001,
   websocketUrl: process.env.NODE_ENV === 'production' 
     ? 'wss://your-domain.com' 
     : `http://localhost:${process.env.PORT || process.env.WEBSOCKET_PORT || 3001}`,
