@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "dev:next": "next dev",
-    "dev:server": "tsx watch server.ts",
-    "start:server": "node dist/server.js",
+    "dev:server": "tsx watch src/server/index.ts",
+    "start:server": "tsx src/server/index.ts",
+    "start:prod": "concurrently \"npm run start:server\" \"npm start\"",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "prepare": "husky"

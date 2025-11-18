@@ -7,6 +7,20 @@ A modern, real-time deployment dashboard for managing and monitoring your applic
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socketdotjs&logoColor=white)
 
+## 🚀 Quick Deploy
+
+**Ready to deploy? Choose your platform:**
+
+- 🏆 **[Railway.app](https://railway.app)** (Recommended) - Deploy in 5 minutes
+- ⚡ **[Fly.io](https://fly.io)** - 100% free forever
+- 🐳 **Docker** - Self-host with Docker Compose
+
+**📚 Deployment Guides:**
+- **Quick Start:** [QUICK_START_DEPLOYMENT.md](./QUICK_START_DEPLOYMENT.md) - 5-minute guide
+- **Complete Guide:** [DEPLOYMENT.md](./DEPLOYMENT.md) - Full deployment documentation
+- **Platform Comparison:** [PLATFORM_COMPARISON.md](./PLATFORM_COMPARISON.md) - Detailed comparison
+- **Summary:** [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) - Executive overview
+
 ## ✨ Features
 
 - 🎯 **Dynamic Project Management** - Load projects from JSON configuration files

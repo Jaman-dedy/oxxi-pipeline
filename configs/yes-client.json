@@ -7,14 +7,14 @@
     "app_name": "web-app",
     "repo_name": "web-app-v2",
     "ssh": false,
-    "production_url": "http://web-app.yesng.com",
-    "staging_url": "http://web-app.yesng.com:9090",
-    "deploy_production": "./ossix-devops/scripts/web-app/deploy.sh --env=production --app_name=web-app --repo_name=web-app-v2 --org=yesng --host=172.201.30.223",
-    "deploy_staging": "./ossix-devops/scripts/web-app/deploy.sh --env=staging --app_name=web-app --repo_name=web-app-v2 --org=yesng --host=172.201.30.223",
-    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 restart web-app-yesng-production\"",
-    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 restart web-app-yesng-staging\"",
-    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 stop web-app-yesng-production\"",
-    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@172.201.30.223 \"pm2 stop web-app-yesng-staging\"",
+    "production_url":"https://app.yesway.money",
+    "staging_url":"https://app.yesway.money:9090",
+    "deploy_production": "./scripts/web-app/deploy.sh --env=production --app_name=web-app --repo_name=web-app-v2 --org=yesng --host=98.71.205.185",
+    "deploy_staging": "./scripts/web-app/deploy.sh --env=staging --app_name=web-app --repo_name=web-app-v2 --org=yesng --host=98.71.205.185",
+    "restart_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@98.71.205.185 \"pm2 restart web-app-yesng-production\"",
+    "restart_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@98.71.205.185 \"pm2 restart web-app-yesng-staging\"",
+    "stop_production": "ssh -i ~/.ssh/id_rsa_ossix ossix@98.71.205.185 \"pm2 stop web-app-yesng-production\"",
+    "stop_staging": "ssh -i ~/.ssh/id_rsa_ossix ossix@98.71.205.185 \"pm2 stop web-app-yesng-staging\"",
     "repository": "https://github.com/Ossix-Technologies/web-app-v2",
-    "workingDirectory": "./ossix-devops"
+    "workingDirectory": "../ossix-devops"
   }

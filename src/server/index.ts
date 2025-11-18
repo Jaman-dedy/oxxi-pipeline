@@ -1,4 +1,4 @@
-// server.ts - Updated for new config system
+// server/index.ts - Updated for new config system
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
