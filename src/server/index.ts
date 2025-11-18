@@ -70,7 +70,7 @@ app.use('/api', createApiRoutes(webSocketService.getCommandService()));
 
 // Next.js request handler (registered after Next prepares)
 const attachNextHandler = () => {
-  app.all('*', (req, res) => handle(req, res));
+  app.get('*', (req, res) => handle(req, res));
 };
 
 // Initialize server with project loading
