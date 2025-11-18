@@ -65,10 +65,11 @@ export function useWebSocket(): UseWebSocketReturn {
 
   // WebSocket setup
   useEffect(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || (typeof window !== 'undefined' ? window.location.origin : undefined);
+    // Connect to backend on port 3001
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
     const socket: Socket = io(wsUrl, {
       path: '/socket.io',
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 10
