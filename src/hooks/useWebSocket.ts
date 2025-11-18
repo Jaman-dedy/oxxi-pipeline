@@ -65,9 +65,14 @@ export function useWebSocket(): UseWebSocketReturn {
 
   // WebSocket setup
   useEffect(() => {
-    const socket: Socket = io(
-      process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001'
-    );
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const socket: Socket = io(wsUrl, {
+      path: '/socket.io',
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 10
+    });
 
     socketRef.current = socket;
 
