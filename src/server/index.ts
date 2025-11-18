@@ -155,17 +155,21 @@ app.get('/', (req, res) => {
   });
 });
 
-const PORT = SERVER_CONFIG.websocketPort;
+const PORT = Number(SERVER_CONFIG.websocketPort);
 
 // Initialize server with project loading
 const initializeServer = async () => {
   try {
     const projects = await ProjectConfigService.loadAllProjects();
     
-    httpServer.listen(PORT, () => {
+    // Bind to 0.0.0.0 to accept connections from Railway
+    httpServer.listen(PORT, '0.0.0.0', () => {
       console.log(`📋 ${projects.length} projects loaded from configurations`);
+      console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
+      console.log(`🔌 WebSocket server ready`);
     });
   } catch (error) {
+    console.error('❌ Server initialization failed:', error);
     process.exit(1);
   }
 };
